@@ -19,5 +19,5 @@ def log_stats(mongo_collection):
 
 
 if __name__ == "__main__":
-    mongo_client = MongoClient('mongodb://127:0.0.1:27017')
+    mongo_client = MongoClient('mongodb://127.0.0.1:27017')
     log_stats(mongo_client.logs.nginx)
