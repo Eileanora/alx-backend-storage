@@ -15,11 +15,7 @@ def cache_url(method: Callable) -> Callable:
     @functools.wraps(method)
     def wrapper(url):
         ''' Wrapper function '''
-        key = "count:" + url
-        redis_db.incr(key)
-        cached = redis_db.get("result:" + url)
-        if cached:
-            return cached.decode('utf-8')
+        redis_db.incr("count:" + url)
         cached = method(url)
         redis_db.setex("result:" + url, 10, cached)
         return cached
