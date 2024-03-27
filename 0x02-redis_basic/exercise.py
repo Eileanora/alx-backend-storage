@@ -19,6 +19,20 @@ def count_calls(method: Callable) -> Callable:
     return wrapper
 
 
+def replay(method: Callable) -> None:
+    ''' Display the history of calls of a particular function '''
+    method_name = method.__qualname__
+    self_redis = method.__self__._redis
+
+    inputs = self_redis.lrange(method_name + ":inputs", 0, -1)
+    outputs = self_redis.lrange(method_name + ":outputs", 0, -1)
+
+    print("{} was called {} times:".format(method_name, len(inputs)))
+    for (input, output) in zip(inputs, outputs):
+        print("{}(*{}) -> {}".format(method_name,
+                                     input.decode("utf-8"), output))
+
+
 def call_history(method: Callable) -> Callable:
     ''' Decorator to store the history of inputs and outputs for a function '''
 
