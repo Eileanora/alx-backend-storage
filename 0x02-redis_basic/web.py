@@ -1,8 +1,10 @@
+#!/usr/bin/env python3
 ''' Module for Redis basic excercise '''
 import redis
 from typing import Callable
 import functools
 import requests
+
 
 redis_db = redis.Redis()
 
@@ -11,9 +13,8 @@ def cache_url(method: Callable) -> Callable:
     ''' Decorator to store the history of inputs and outputs for a function\
         and caches the result of the URL for 10 sec '''
     @functools.wraps(method)
-    def wrapper(self, *args, **kwargs):
+    def wrapper(url):
         ''' Wrapper function '''
-        url = args[0]
         key = "count:" + url
         redis_db.incr(key)
         cached = redis_db.get("result:" + url)

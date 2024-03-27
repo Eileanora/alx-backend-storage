@@ -4,11 +4,10 @@ Main file
 """
 import redis
 
-Cache = __import__('exercise').Cache
-replay = __import__('exercise').replay
+from web import get_page
+url = 'http://slowwly.robertomurray.co.uk/delay/5000/url/http://www.google.co.uk'
+print(get_page(url))
+print(get_page(url))
+print(get_page(url))
+print(get_page(url))
 
-cache = Cache()
-cache.store("foo")
-cache.store("bar")
-cache.store(42)
-replay(cache.store)
