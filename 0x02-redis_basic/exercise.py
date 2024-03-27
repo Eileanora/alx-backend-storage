@@ -2,7 +2,37 @@
 ''' Module for Redis basic excercise '''
 import redis
 import uuid
+import functools
 from typing import Union, Callable
+
+
+# how to define a decorator
+def count_calls(method: Callable) -> Callable:
+    ''' Decorator to count the number of calls '''
+
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        ''' Wrapper function '''
+        self._redis.incr(method.__qualname__)
+        return method(self, *args, **kwargs)
+
+    return wrapper
+
+
+def call_history(method: Callable) -> Callable:
+    ''' Decorator to store the history of inputs and outputs for a function '''
+
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        ''' Wrapper function '''
+        input_keys = method.__qualname__ + ":inputs"
+        output_keys = method.__qualname__ + ":outputs"
+        self._redis.rpush(input_keys, str(args))
+        output = method(self, *args, **kwargs)
+        self._redis.rpush(output_keys, str(output))
+        return output
+
+    return wrapper
 
 
 class Cache:
@@ -12,6 +42,8 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @count_calls
+    @call_history
     def store(self, data: Union[str, bytes, int, float]) -> str:
         ''' Store method '''
         key = str(uuid.uuid4())
